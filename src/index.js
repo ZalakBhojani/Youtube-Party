@@ -44,6 +44,11 @@ io.on('connection', (socket) => {
         const user = getUser(socket.id)
         socket.broadcast.to(user.room).emit("videoPaused")
     })
+
+    socket.on("videoPlaying", () => {
+        const user = getUser(socket.id)
+        socket.broadcast.to(user.room).emit("videoPlaying")
+    })
     
 
     socket.on('disconnect', () => {
