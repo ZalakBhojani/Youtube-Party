@@ -72,9 +72,10 @@ function onYouTubeIframeAPIReady() {
         height: '500',
         width: '850',
         videoId: 'zWSvb5t_zH4',
+        playerVars: { 'controls': 0 },
         events: {
-        'onReady': onPlayerReady,
-        'onStateChange': onPlayerStateChange
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
         }
     });
 }
@@ -96,13 +97,14 @@ function onPlayerStateChange(event) {
         socket.emit("videoPlaying");
     }
 
-    if(event.Data = YT.PlayerState.ENDED) {
+    if(event.Data === YT.PlayerState.ENDED) {
         //Play next video in the playlist
     }
 }
 
 // 4. The API will call this function when the video player is ready.
 function onPlayerReady(event) {
+    //deafult state of the video is paused
     event.target.stopVideo();
 }
 
