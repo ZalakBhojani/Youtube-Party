@@ -81,7 +81,7 @@ let url;
 urlSubmitForm.addEventListener('submit', (event) => {
     event.preventDefault();
     url = urlSubmitForm.elements['yturl'].value;
-    pushQueue(url)
+    // pushQueue(url)
 });
 
 // queue functions
