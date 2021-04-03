@@ -6,8 +6,7 @@ const $messageFormInput = $messageForm.querySelector('input')
 const $messageFormButton = $messageForm.querySelector('button')
 
 const $messages = document.querySelector('#messages')
-
-let urlSubmitForm  = document.getElementById('yturlForm');
+const urlSubmitForm  = document.querySelector('#yturlForm');
 
 
 // Templates
@@ -75,25 +74,16 @@ function youtube_parser(url){
     return (match&&match[7].length==11)? match[7] : false;
 }
 
-console.log(youtube_parser("https://www.youtube.com/watch?v=WNNf5JPuwZg&list=PLrwNNiB6YOA1a0_xXvogmvSHrLcanVKkF&index=2"))
-
 let url;
+var queue = [];
+var curVid;
 urlSubmitForm.addEventListener('submit', (event) => {
     event.preventDefault();
     url = urlSubmitForm.elements['yturl'].value;
-    // pushQueue(url)
+    queue.push(youtube_parser(url));
+    curVid = queue[0];
 });
 
-// queue functions
-// var queue = [];
-// function pushQueue(url){
-//     queue.push(youtube_parser(url)); 
-// }
-
-// function frontQueue(){
-//     var curVid = queue.shift();
-//     console.log(curVid)
-// }
 
 // 3. This function creates an <iframe> (and YouTube player)
 //    after the API code downloads.
@@ -102,8 +92,8 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '500',
         width: '850',
-        videoId: 'zWSvb5t_zH4',
-        // videoId: curVid,
+        // videoId: 'zWSvb5t_zH4',
+        videoId: curVid,
         events: {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange
