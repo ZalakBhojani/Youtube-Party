@@ -2,8 +2,7 @@ const path = require('path')
 const http = require('http')
 const express = require('express')
 const socketio = require('socket.io')
-const Filter = require('bad-words')
-const { generateMessage, generateLocationMessage } = require('./utils/messages')
+const { generateMessage } = require('./utils/messages')
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users')
 
 const app = express()
@@ -26,8 +25,6 @@ io.on('connection', (socket) => {
         }
 
         socket.join(user.room)
-
-        
         socket.broadcast.to(user.room).emit('message', generateMessage(`${user.username} has joined!`))
         io.to(user.room).emit('roomData',{
             room: user.room,
@@ -38,13 +35,15 @@ io.on('connection', (socket) => {
 
     socket.on('sendMessage', (message, callback) => {
         const user = getUser(socket.id)
-        const filter = new Filter()
 
-
-        io.to(user.room).emit('message', generateMessage(user.username,message))
+        io.to(user.room).emit('message', generateMessage(user.username, message))
         callback()
     })
 
+    socket.on("videoPaused", () => {
+        const user = getUser(socket.id)
+        socket.broadcast.to(user.room).emit("videoPaused")
+    })
     
 
     socket.on('disconnect', () => {

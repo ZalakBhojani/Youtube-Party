@@ -1,24 +1,32 @@
 <html>
   <head>
-    <title>Chat App</title>
+    <title>YouTube Party</title>
     <link rel="icon" href="/img/favicon.png" />
-    <link rel="stylesheet" href="/css/styles.min.css" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Roboto:wght@300&display=swap" rel="stylesheet">  
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/main.css" />
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
   </head>
   <body>
+
+    <h1 class="text-center mt-5 text-light">WATCH <i class="fa fa-youtube-play" style="font-size:46px"></i> YOUTUBE WITH FRIENDS</h1>
+    <h5 class="text-center text-light">Synchronized YouTube Player and Chat</h5>
     <div class="centered-form">
       <div class="centered-form__box">
-        <h1>Join</h1>
+        <h2 class="mb-5">Create or join a room and invite friends</h2>
         <form action="/chat.html">
-          <label>Display name</label>
+          <label>Display Name</label>
           <input
+            required
             type="text"
             name="username"
-            placeholder="Display name"
-            required=""
+            placeholder="Enter Display Name"
           />
           <label>Room</label>
-          <input type="text" name="room" placeholder="Room" required="" />
-          <button>Join</button>
+          <input required type="text" name="room" placeholder="Enter Room Name" />
+          <button>START PARTY</button>
         </form>
       </div>
     </div>
