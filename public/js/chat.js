@@ -4,10 +4,8 @@ const socket = io()
 const $messageForm = document.querySelector('#message-form')
 const $messageFormInput = $messageForm.querySelector('input')
 const $messageFormButton = $messageForm.querySelector('button')
-
 const $messages = document.querySelector('#messages')
-const urlSubmitForm  = document.querySelector('#yturlForm');
-
+const $urlSubmitForm  = document.querySelector('#yturlForm');
 
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
@@ -76,23 +74,15 @@ function youtube_parser(url){
 
 let url;
 var queue = [];
-var curVid;
-urlSubmitForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    url = urlSubmitForm.elements['yturl'].value;
-    queue.push(youtube_parser(url));
-    curVid = queue[0];
-});
-
-
+var curVid = '';
+var player;
 // 3. This function creates an <iframe> (and YouTube player)
 //    after the API code downloads.
-var player;
+
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '500',
         width: '850',
-        // videoId: 'zWSvb5t_zH4',
         videoId: curVid,
         events: {
             'onReady': onPlayerReady,
@@ -100,6 +90,22 @@ function onYouTubeIframeAPIReady() {
         }
     });
 }
+
+
+$urlSubmitForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    url = $urlSubmitForm.elements['yturl'].value;
+    queue.push(youtube_parser(url));
+    curVid = queue[0];
+    console.log(curVid);
+    player.loadVideoById(curVid);
+    socket.emit("newVideoAdded", {curVid})
+});
+
+socket.on("newVideoAdded", (curVid) => {
+    player.loadVideoById(curVid);
+})
+
 
 socket.on("videoPaused", () => {
     player.pauseVideo();
