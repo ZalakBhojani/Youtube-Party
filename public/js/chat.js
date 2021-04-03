@@ -56,3 +56,56 @@ socket.emit('join', { username, room }, (error) => {
         location.href = '/'
     }
 })
+
+//YOUTUBE related stuff
+var tag = document.createElement('script');
+
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+// 3. This function creates an <iframe> (and YouTube player)
+//    after the API code downloads.
+var player;
+function onYouTubeIframeAPIReady() {
+    player = new YT.Player('player', {
+        height: '500',
+        width: '850',
+        videoId: 'zWSvb5t_zH4',
+        events: {
+        'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange
+        }
+    });
+}
+
+socket.on("videoPaused", () => {
+    player.pauseVideo();
+})
+
+socket.on("videoPlaying", () => {
+    player.playVideo();
+})
+
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PAUSED) {
+        socket.emit("videoPaused");
+    }
+
+    if (event.data === YT.PlayerState.PLAYING) {
+        socket.emit("videoPlaying");
+    }
+
+    if(event.Data = YT.PlayerState.ENDED) {
+        //Play next video in the playlist
+    }
+}
+
+// 4. The API will call this function when the video player is ready.
+function onPlayerReady(event) {
+    event.target.stopVideo();
+}
+
+function stopVideo() {
+    player.stopVideo();
+}
