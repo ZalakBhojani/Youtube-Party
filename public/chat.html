@@ -48,7 +48,7 @@
               function onPlayerStateChange(event) {
                 if (event.data === YT.PlayerState.PAUSED) {
                   console.log("video is paused")
-                  socket.emit("videoPaused");
+                  io.emit("videoPaused");
                 }
 
                 if(event.Data = YT.PlayerState.ENDED) {
