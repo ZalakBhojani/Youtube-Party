@@ -64,6 +64,14 @@ For development, you will only need Node.js and a node global package, Yarn, ins
 <img src="./screenshots/9.PNG" width=900px/>
 <br>
 </div>
+ 
+### Start with cloning this repo on your local machine
+
+```sh
+$ git clone https://github.com/ZalakBhojani/Youtube-Party
+$ cd YoutTube-Party 
+```
+
 
 ### Node
 - #### Node installation on Windows
@@ -93,32 +101,16 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
 
     $ npm install npm -g
 
-###
-### Yarn installation
-  After installing node, this project will need yarn too, so just run the following command.
 
-      $ npm install -g yarn
+## To install required npm packages, run:
 
----
+```sh
+$ npm install 
+```
 
-## Install
+## To run the project
 
-    $ git clone https://github.com/YOUR_USERNAME/PROJECT_TITLE
-    $ cd PROJECT_TITLE
-    $ yarn install
-
-## Configure app
-
-Open `a/nice/path/to/a.file` then edit it with your settings. You will need:
-
-- A setting;
-- Another setting;
-- One more setting;
-
-## Running the project
-
-    $ yarn start
-
-## Simple build for production
-
-    $ yarn build
+```sh
+cd src
+$ node index.js
+```
