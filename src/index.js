@@ -45,9 +45,9 @@ io.on('connection', (socket) => {
         socket.broadcast.to(user.room).emit("videoPaused")
     })
 
-    socket.on("videoPlaying", () => {
+    socket.on("newVideoAdded", () => {
         const user = getUser(socket.id)
-        socket.broadcast.to(user.room).emit("videoPlaying")
+        socket.broadcast.to(user.room).emit("newVideoAdded", {curVid})
     })
     
 
