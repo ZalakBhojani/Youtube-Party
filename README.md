@@ -17,6 +17,9 @@ with your friends in the room and share your thoughts about the video.
 - Backend - Node JS
 - Socket.io
 
+## API
+- [YouTube Player API](https://developers.google.com/youtube/iframe_api_reference)
+
 ## Requirements
 
 For development, you will only need Node.js and a node global package, Yarn, installed in your environement.
