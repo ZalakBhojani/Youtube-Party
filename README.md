@@ -1,5 +1,8 @@
 # YouTube Party - KJSCE Hack 2021
 
+[![](https://img.shields.io/badge/Made_with-NodeJS-red?style=for-the-badge&logo=node.js)](https://javascript.com "NodeJS")
+[![](https://img.shields.io/badge/Made_with-SocketIO-green?style=for-the-badge&logo=socket.io)](https://javascript.com "Socket.io")
+
 A video synchronization platform just like Netflix Party but for YouTube, where you can watch YouTube videos in real-time with your friends.
 
 You can create a room by entering your display name and room name. Your friends can then join you by entering the same room name. After joining the room, anyone can enter a 
@@ -9,9 +12,25 @@ Anyone can play/pause the video or go to any timestamp in the progress bar and i
 with your friends in the room and share your thoughts about the video.
 
 ---
+## Tech Stack
+- Frontend - HTML, CSS, JavaScript, Bootstrap
+- Backend - Node JS
+- Socket.io
+
 ## Requirements
 
 For development, you will only need Node.js and a node global package, Yarn, installed in your environement.
+
+## Things we are yet to complete
+- Add playlist feature
+- Improve UI
+- Randomly generate a room name instead of taking input from user
+
+## Issues that are still not solved
+- If the video is running and some new participant joins the room then he/she will not be able to watch the video.
+- If the user drags along the progress bar instead of directly going to some timestamp then that change is not reflected.
+
+## Screenshots
 
 ### Node
 - #### Node installation on Windows
