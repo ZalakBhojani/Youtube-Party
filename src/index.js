@@ -40,14 +40,20 @@ io.on('connection', (socket) => {
         callback()
     })
 
-    socket.on("videoPaused", () => {
+    socket.on("videoPaused", (currTime) => {
         const user = getUser(socket.id)
-        socket.broadcast.to(user.room).emit("videoPaused")
+        socket.broadcast.to(user.room).emit("videoPaused", currTime)
     })
 
-    socket.on("newVideoAdded", () => {
+    socket.on("videoPlaying", () => {
         const user = getUser(socket.id)
-        socket.broadcast.to(user.room).emit("newVideoAdded", {curVid})
+        console.log("video is playing")
+        socket.broadcast.to(user.room).emit("videoPlaying")
+    })
+
+    socket.on("newVideoAdded", (newVideo) => {
+        const user = getUser(socket.id)
+        socket.broadcast.to(user.room).emit("newVideoAdded", newVideo)
     })
     
 
