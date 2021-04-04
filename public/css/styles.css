@@ -44,11 +44,13 @@ input {
     outline: none;
 }
 
+
 button {
     cursor: pointer;
     padding: 12px;
     background: #7C5CBF;
     border: none;
+    
     color: white;
     font-size: 16px;
     transition: background .3s ease;
@@ -62,6 +64,7 @@ button:disabled {
     cursor: default;
     background: #7c5cbf94;
 }
+
 
 /* Join Page Styles */
 
@@ -188,4 +191,23 @@ button:disabled {
     list-style-type: none;
     font-weight: 300;
     padding: 12px 24px 0 24px;
+}
+
+#urlSubmit{
+
+    width: 100px;
+    padding: 12px;
+    background: #7C5CBF;
+  
+    border-radius: 20px;
+    color: white;
+    font-size: 16px;
+    transition: background .3s ease;
+
+}
+
+
+#yturl{
+    border-radius: 10px;
+    
 }
