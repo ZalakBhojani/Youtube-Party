@@ -99,25 +99,30 @@ $urlSubmitForm.addEventListener('submit', (event) => {
     curVid = queue[0];
     console.log(curVid);
     player.loadVideoById(curVid);
-    socket.emit("newVideoAdded", {curVid})
+    const newVideo = {curVidID: curVid}
+    socket.emit("newVideoAdded", newVideo)
 });
 
-socket.on("newVideoAdded", (curVid) => {
-    player.loadVideoById(curVid);
+socket.on("newVideoAdded", (newVideo) => {
+    player.loadVideoById(newVideo.curVidID);
 })
 
 
-socket.on("videoPaused", () => {
+socket.on("videoPaused", (currTime) => {
+    console.log("video is paused")
+    player.seekTo(currTime.timeElapsed, false);
     player.pauseVideo();
 })
 
 socket.on("videoPlaying", () => {
+    console.log("video is playing")
     player.playVideo();
 })
 
 function onPlayerStateChange(event) {
     if (event.data === YT.PlayerState.PAUSED) {
-        socket.emit("videoPaused");
+        const currTime = {timeElapsed: player.getCurrentTime()}
+        socket.emit("videoPaused", currTime);
     }
 
     if (event.data === YT.PlayerState.PLAYING) {
