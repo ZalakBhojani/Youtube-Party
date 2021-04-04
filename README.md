@@ -32,6 +32,36 @@ For development, you will only need Node.js and a node global package, Yarn, ins
 
 ## Screenshots
 
+<div align="center">
+<h4 align="center">Room Joining Page</h4>
+<img src="./screenshots/1.PNG" width=900px/>
+<br>
+ <h4 align="center">Joining room by providing username and room</h4>
+<img src="./screenshots/2.PNG" width=900px/>
+<br>
+<h4 align="center">After joining room dashboard</h4>
+<img src="./screenshots/3.PNG" width=900px/>
+<br>
+<h4 align="center">Other user joining the same room with thier username</h4>
+<img src="./screenshots/4.PNG" width=900px/>
+<br>
+<h4 align="center">when someone join the room it show message that user has joined the room</h4>
+<img src="./screenshots/5.PNG" width=900px/>
+<br>
+<h4 align="center">To watch the video, any user in the same room can submit the URL of video and everyone will be able to see that same video with same timestamp</h4>
+<img src="./screenshots/6.PNG" width=900px/>
+<br>
+<h4 align="center">all users watching the same video with same timestamp</h4>
+<img src="./screenshots/7.PNG" width=900px/>
+<br>
+  <h4 align="center">if any user will change the timestamp of video then it will reflect to all the users</h4>
+<img src="./screenshots/8.PNG" width=900px/>
+<br>
+  <h4 align="center">playing video with same timestamp to all the users after someone has changed the timestamp of video</h4>
+<img src="./screenshots/9.PNG" width=900px/>
+<br>
+</div>
+
 ### Node
 - #### Node installation on Windows
 
