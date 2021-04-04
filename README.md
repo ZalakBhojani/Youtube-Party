@@ -73,7 +73,7 @@ $ cd YoutTube-Party
 ```
 
 
-### Node
+### Node Installation
 - #### Node installation on Windows
 
   Just go on [official Node.js website](https://nodejs.org/) and download the installer.
@@ -102,13 +102,13 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
     $ npm install npm -g
 
 
-## To install required npm packages, run:
+### To install required npm packages, run:
 
 ```sh
 $ npm install 
 ```
 
-## To run the project
+### To run the project
 
 ```sh
 cd src
