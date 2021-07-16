@@ -1,0 +1,59 @@
+body{
+    font-family: 'Montserrat',sans-serif;
+}
+
+.chat {
+    display: flex;
+    height: 450px;
+}
+
+.chat__sidebar {
+    height: 100vh;
+    color: white;
+    background: #333744;
+    width: 225px;
+    overflow-y: scroll
+}
+
+.chat__main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
+}
+
+.chat__messages {
+    flex-grow: 1;
+    padding: 12px 12px 0 12px;
+    overflow-y: scroll;
+}
+
+/* Message Styles */
+
+.message {
+    margin-bottom: 4px;
+}
+
+.message__name {
+    font-weight: 600;
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+.message__meta {
+    color: #777;
+    font-size: 14px;
+}
+
+.message a {
+    color: #0070CC;
+}
+
+/* Message Composition Styles */
+
+.compose {
+    /* display: flex; */
+    flex-shrink: 0;
+    margin-top: 16px;
+    padding: 24px;
+}

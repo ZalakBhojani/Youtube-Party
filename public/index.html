@@ -13,32 +13,28 @@
     <body>
         <div class="container">
             <div class="mx-5 my-5">
-                <form>
+                <form action="/room.html" method="GET">
                   <div class="mb-3">
                     <h1 class="mb-4">Join Room</h1>
-                    <label for="exampleInputEmail1" class="form-label">Username</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control">
                   </div>
                   <div class="mb-3">
-                    <label for="exampleInputPassword1" class="form-label">Room Name</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1">
+                    <label class="form-label">Room ID</label>
+                    <input type="text" name="roomid" class="form-control">
                   </div>
                   <button type="submit" class="btn btn-primary">Join</button>
                 </form>
             </div>
 
             <div class="mx-5 my-5">
-              <form>
+              <form action="/room.html" method="GET">
                 <div class="mb-3">
                   <h1 class="mb-4">Create Room</h1>
-                  <label for="exampleInputEmail1" class="form-label">Username</label>
-                  <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                  <label class="form-label">Username</label>
+                  <input type="text" name="username" class="form-control">
                 </div>
-                <div class="mb-3">
-                  <label for="exampleInputPassword1" class="form-label">Room Name</label>
-                  <input type="password" class="form-control" id="exampleInputPassword1">
-                </div>
-                <button type="submit" class="btn btn-primary">Join</button>
+                <button type="submit" class="btn btn-primary">Create</button>
               </form>
             </div>
         </div>

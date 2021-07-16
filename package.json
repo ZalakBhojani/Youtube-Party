@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/ZalakBhojani/Youtube-Party#readme",
   "dependencies": {
+    "clipboard": "^2.0.8",
     "express": "^4.17.1",
     "socket.io": "^4.1.2",
     "socket.io-client": "^4.1.2"
