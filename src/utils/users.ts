@@ -7,6 +7,7 @@ export type UserType = {
     room: string,
     role: string
 }
+
 const users: UserType[] = [];
 
 export const addUser = (userObj: UserType) => {
@@ -25,7 +26,6 @@ export const addUser = (userObj: UserType) => {
     }
 
     users.push(userObj);
-    console.log(users);
     return {userObj}
 
 }
@@ -41,6 +41,10 @@ export const removeUser = (id: string) => {
 
 export const getUser = (id: string) => {
     return users.find((user) => user.id == id);
+}
+
+export const getAllUsers = () => {
+    return users;
 }
 
 // export const updateRole = (id: string, newRole: number) => {

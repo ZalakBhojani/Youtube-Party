@@ -1,8 +1,11 @@
 var socket = io();
 
+// Copy room code
 var btn = document.getElementById('btn');
 var clipboard = new ClipboardJS(btn);
       
+
+// Fetch user details
 const params = new URLSearchParams(window.location.search);
 var username = params.get('username');
 var roomid;
@@ -26,14 +29,25 @@ if (params.has('roomid')) {
 const $messageForm = document.querySelector('#message-form');
 const $messageFormButton = document.querySelector("#submit-button");
 const $messageFormInput = document.querySelector("#inputMessage");
-const $messages = document.querySelector('#messages')
+const $urlForm = document.querySelector("#url-form");
+const $messages = document.querySelector('#messages');
+const $users = document.querySelector('#users');
 
 // Templates
 const messageTemplate = document.querySelector("#message-template").innerHTML;
+const userTemplate = document.querySelector("#user-template").innerHTML;
 
+// gets the videoID from URL (string) 
+function youtube_parser(url){
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    var match = url.match(regExp);
+    return (match&&match[7].length==11)? match[7] : false;
+}
+
+// Socket communication
 $messageForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    console.log(e);
+
     $messageFormButton.setAttribute('disabled', 'disabled')
     const message = e.target.elements.inputMessage.value;
     
@@ -48,14 +62,46 @@ $messageForm.addEventListener('submit', (e) => {
     })
 })
 
+var currVideo = 'M7lc1UVf-VE';
+var queue = [];
+var url;
+
+$urlForm.addEventListener('submit', (event) => {
+    event.preventDefault()
+
+    url = $urlForm.elements['url'].value
+    currVideo = youtube_parser(url)
+
+    player.loadVideoById(currVideo)
+    socket.emit("newVideoAdded", currVideo)
+
+})
+
+socket.on("newVideoAdded", (newVideo) => {
+    player.loadVideoById(newVideo)
+})
+
 
 socket.on('message', (message) => {
     const html = Mustache.render(messageTemplate, {
         username: message.username,
         message: message.text
     })
-    console.log(message.text)
     $messages.insertAdjacentHTML('beforeend', html)
+})
+
+socket.on('roomUsersList', (usersList) => {
+    const list = usersList.usersList;
+    for (var index = 0; index < list.length; index++) {
+        var username = list[index].username
+        if(list[index].role === 'ADMIN') {
+           username += " (Owner)" 
+        }
+        const html = Mustache.render(userTemplate, {
+            username: username,
+        })
+        $users.insertAdjacentHTML('beforeend', html)
+    }
 })
 
 
@@ -76,7 +122,7 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '450',
         width: '800',
-        videoId: 'M7lc1UVf-VE',
+        videoId: currVideo,
         playerVars: {
             'playsinline': 1
         },
@@ -89,22 +135,29 @@ function onYouTubeIframeAPIReady() {
 
 // 4. The API will call this function when the video player is ready.
 function onPlayerReady(event) {
-    event.target.playVideo();
+    event.target.pauseVideo();
 }
 
 // 5. The API calls this function when the player's state changes.
 //    The function indicates that when playing a video (state=1),
 //    the player should play for six seconds and then stop.
-var done = false;
 function onPlayerStateChange(event) {
 
-    if (event.data === YT.PlayerState.PAUSED) {
-        socket.emit("videoPaused", (roomid));
+    if (event.data === YT.PlayerState.PAUSED && role === 'ADMIN') {
+        socket.emit("videoPaused", roomid);
     }
 
-    if (event.data === YT.PlayerState.PLAYING) {
-        socket.emit("videoPlaying", (roomid));
+    if (event.data === YT.PlayerState.PLAYING && role === 'ADMIN') {
+        const data = {
+            id: roomid,
+            currentTime: player.getCurrentTime()
+        }
+        socket.emit("videoPlaying", data)
     }
+
+    // if (event.data === YT.PlayerState.BUFFERING ) {
+    //     socket.emit("videoPaused", roomid);
+    // }
 
 }
 
@@ -117,6 +170,8 @@ socket.on("videoPaused", () => {
     player.pauseVideo();
 })
 
-socket.on("videoPlaying", () => {
+socket.on("videoPlaying", (currentTime) => {
+    console.log(currentTime)
+    player.seekTo(currentTime, true)
     player.playVideo();
 })

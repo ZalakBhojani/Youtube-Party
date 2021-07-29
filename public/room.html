@@ -21,8 +21,8 @@
             <a class="navbar-brand" href="#">
                 <div class="row">
                     <div class="col">
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/YouTube_icon_%282013-2017%29.png/640px-YouTube_icon_%282013-2017%29.png"
-    alt="" width="52" height="36" class="d-inline-block align-text-top my-2">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/YouTube_icon_%282013-2017%29.png/640px-YouTube_icon_%282013-2017%29.png"
+                        alt="" width="52" height="36" class="d-inline-block align-text-top my-2">
                     </div>
                     <div class="col">
                         <b style="font-size: 36px;">YouTube Party</b>
@@ -31,8 +31,8 @@
                 
                 
             </a>
-            <form class="d-flex w-50">
-                <input class="form-control  mx-2" type="search" placeholder="Enter YouTube Video URL"
+            <form class="d-flex w-50" id="url-form">
+                <input class="form-control mx-2" id="url" type="search" placeholder="Enter YouTube Video URL"
                     aria-label="Search">
                 <button class="btn btn-danger" type="submit">Add</button>
             </form>
@@ -40,7 +40,9 @@
 
         <div class="row mt-5">
             <div class="col-lg-8">
-                <div id="player"></div>
+                <div class="video-container">
+                    <div id="player"></div>
+                </div>
                 <h3 class="mt-5">YouTube Developers Live</h3>
                 <p>YouTube Channel</p>
             </div>
@@ -93,10 +95,16 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
-                        <div class="chat bg-light text-dark"> </div>
+                        <div class="chat bg-light text-dark">
+                            
+                        </div>
                     </div>
                     <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
-                        <div class="chat bg-light text-dark"> </div>
+                        <div class="chat bg-light text-dark"> 
+                            <div class="chat__main">
+                                <div id="users" class="chat__messages"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -107,9 +115,17 @@
     <script id="message-template" type="text/html">
         <div class="message">
             <div class="row">
-                <p class="message__name"><b>{{username}}</b> {{message}}</p>
+                <p class="message__name"><span class="font-weight-bold text-primary">{{username}}</span> {{message}}</p>
             </div>
+        </div>
+    </script>
 
+    <script id="user-template" type="text/html">
+        <div class="message">
+            <div class="row mx-3">
+                <p class="message__name"><span class="font-weight-bold text-success">{{username}}</span></p>
+                <hr>
+            </div>
         </div>
     </script>
 

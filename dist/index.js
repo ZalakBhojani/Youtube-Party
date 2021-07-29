@@ -25,41 +25,52 @@ app.post("/room.html", (req, res) => {
     res.end();
 });
 io.on("connection", (socket) => {
-    console.log(`${socket.id} is connected`);
+    var currUser;
+    const updateUsersList = (roomID) => {
+        const usersList = users_1.getAllUsers();
+        socket.to(roomID).emit('roomUsersList', { usersList });
+    };
     socket.on("createRoom", (userObj) => {
         const roomID = generateRoomID_1.generateRoomID();
-        users_1.addUser({
+        const user = {
             id: socket.id,
             username: userObj.username,
             room: roomID,
             role: userObj.role
-        });
+        };
+        users_1.addUser(user);
+        currUser = user;
         socket.join(roomID);
         socket.emit("getRoomID", (roomID));
+        updateUsersList(roomID);
     });
     socket.on("joinRoom", (userObj) => {
-        users_1.addUser({
+        const user = {
             id: socket.id,
             username: userObj.username,
             room: userObj.roomid,
             role: userObj.role
-        });
+        };
+        users_1.addUser(user);
+        currUser = user;
         socket.join(userObj.roomid);
         const message = "has joined the Room 🎉";
         socket.to(userObj.roomid).emit('message', messages_1.generateMessage(userObj.username, message));
+        updateUsersList(userObj.roomid);
     });
     socket.on("videoPaused", (id) => {
         socket.to(id).emit("videoPaused");
-        console.log("Video is paused");
     });
-    socket.on("videoPlaying", (id) => {
-        socket.to(id).emit("videoPlaying");
-        console.log("Video is playing");
+    socket.on("videoPlaying", (data) => {
+        socket.to(data.id).emit("videoPlaying", data.currentTime);
     });
     socket.on('sendMessage', (message, callback) => {
         const user = users_1.getUser(socket.id);
         io.to(user.room).emit('message', messages_1.generateMessage(user.username, message));
         callback();
+    });
+    socket.on("newVideoAdded", (newVideo) => {
+        socket.to(currUser.room).emit("newVideoAdded", newVideo);
     });
 });
 httpServer.listen(port, () => {

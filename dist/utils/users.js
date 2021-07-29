@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUser = exports.removeUser = exports.addUser = void 0;
+exports.getAllUsers = exports.getUser = exports.removeUser = exports.addUser = void 0;
 const users = [];
 const addUser = (userObj) => {
     // Clean the data, remove whitespaces
@@ -14,7 +14,6 @@ const addUser = (userObj) => {
         };
     }
     users.push(userObj);
-    console.log(users);
     return { userObj };
 };
 exports.addUser = addUser;
@@ -29,6 +28,10 @@ const getUser = (id) => {
     return users.find((user) => user.id == id);
 };
 exports.getUser = getUser;
+const getAllUsers = () => {
+    return users;
+};
+exports.getAllUsers = getAllUsers;
 // export const updateRole = (id: string, newRole: number) => {
 //     const index: number = users.findIndex(user => user.id == id)
 //     if (newRole ==== 1 && users[index].role == 'GUEST') {
