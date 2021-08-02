@@ -57,12 +57,13 @@ io.on("connection", (socket) => {
         const message = "has joined the Room 🎉";
         socket.to(userObj.roomid).emit('message', messages_1.generateMessage(userObj.username, message));
         updateUsersList(userObj.roomid);
+        socket.to(userObj.roomid).emit("newUserJoined");
     });
-    socket.on("videoPaused", (id) => {
-        socket.to(id).emit("videoPaused");
+    socket.on("videoPaused", () => {
+        socket.to(currUser.room).emit("videoPaused");
     });
-    socket.on("videoPlaying", (data) => {
-        socket.to(data.id).emit("videoPlaying", data.currentTime);
+    socket.on("videoPlaying", (currentTime) => {
+        socket.to(currUser.room).emit("videoPlaying", currentTime);
     });
     socket.on('sendMessage', (message, callback) => {
         const user = users_1.getUser(socket.id);

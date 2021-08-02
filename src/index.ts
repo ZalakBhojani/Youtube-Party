@@ -48,7 +48,7 @@ io.on("connection", (socket: any) => {
         socket.emit("getRoomID", (roomID))
 
         updateUsersList(roomID)
-        
+
     })
 
     socket.on("joinRoom", (userObj: any) => {
@@ -70,17 +70,19 @@ io.on("connection", (socket: any) => {
 
         updateUsersList(userObj.roomid)
 
+        socket.to(userObj.roomid).emit("newUserJoined")
+
     })
 
-    socket.on("videoPaused", (id: string) => {
-        socket.to(id).emit("videoPaused");
+    socket.on("videoPaused", () => {
+        socket.to(currUser.room).emit("videoPaused");
     })
 
-    socket.on("videoPlaying", (data: any) => {
-        socket.to(data.id).emit("videoPlaying", data.currentTime);
+    socket.on("videoPlaying", (currentTime: any) => {
+        socket.to(currUser.room).emit("videoPlaying", currentTime);
     })
 
-    socket.on('sendMessage',(message:any, callback:any) => {
+    socket.on('sendMessage', (message: any, callback: any) => {
         const user: UserType = getUser(socket.id)!;
         io.to(user.room).emit('message', generateMessage(user.username, message))
         callback()

@@ -3,7 +3,7 @@ var socket = io();
 // Copy room code
 var btn = document.getElementById('btn');
 var clipboard = new ClipboardJS(btn);
-      
+
 
 // Fetch user details
 const params = new URLSearchParams(window.location.search);
@@ -38,10 +38,10 @@ const messageTemplate = document.querySelector("#message-template").innerHTML;
 const userTemplate = document.querySelector("#user-template").innerHTML;
 
 // gets the videoID from URL (string) 
-function youtube_parser(url){
+function youtube_parser(url) {
     var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
     var match = url.match(regExp);
-    return (match&&match[7].length==11)? match[7] : false;
+    return (match && match[7].length == 11) ? match[7] : false;
 }
 
 // Socket communication
@@ -50,7 +50,7 @@ $messageForm.addEventListener('submit', (e) => {
 
     $messageFormButton.setAttribute('disabled', 'disabled')
     const message = e.target.elements.inputMessage.value;
-    
+
     socket.emit('sendMessage', message, (error) => {
         $messageFormButton.removeAttribute('disabled');
         $messageFormInput.value = '';
@@ -71,6 +71,7 @@ $urlForm.addEventListener('submit', (event) => {
 
     url = $urlForm.elements['url'].value
     currVideo = youtube_parser(url)
+    $urlForm.elements['url'].value = ''
 
     player.loadVideoById(currVideo)
     socket.emit("newVideoAdded", currVideo)
@@ -94,8 +95,8 @@ socket.on('roomUsersList', (usersList) => {
     const list = usersList.usersList;
     for (var index = 0; index < list.length; index++) {
         var username = list[index].username
-        if(list[index].role === 'ADMIN') {
-           username += " (Owner)" 
+        if (list[index].role === 'ADMIN') {
+            username += " (Owner)"
         }
         const html = Mustache.render(userTemplate, {
             username: username,
@@ -144,34 +145,30 @@ function onPlayerReady(event) {
 function onPlayerStateChange(event) {
 
     if (event.data === YT.PlayerState.PAUSED && role === 'ADMIN') {
-        socket.emit("videoPaused", roomid);
+        socket.emit("videoPaused");
     }
 
     if (event.data === YT.PlayerState.PLAYING && role === 'ADMIN') {
-        const data = {
-            id: roomid,
-            currentTime: player.getCurrentTime()
-        }
-        socket.emit("videoPlaying", data)
+        const currentTime = player.getCurrentTime()
+        socket.emit("videoPlaying", currentTime)
     }
-
-    // if (event.data === YT.PlayerState.BUFFERING ) {
-    //     socket.emit("videoPaused", roomid);
-    // }
-
 }
-
-function stopVideo() {
-    player.stopVideo();
-}
-
 
 socket.on("videoPaused", () => {
     player.pauseVideo();
 })
 
 socket.on("videoPlaying", (currentTime) => {
-    console.log(currentTime)
     player.seekTo(currentTime, true)
     player.playVideo();
+})
+
+socket.on("newUserJoined", () => {
+    if (role === 'ADMIN') {
+        const currentTime = player.getCurrentTime()
+        if (currentTime > 0) {
+            socket.emit("videoPlaying", currentTime)
+        }
+    }
+
 })
