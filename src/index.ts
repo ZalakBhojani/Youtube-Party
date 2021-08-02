@@ -64,13 +64,11 @@ io.on("connection", (socket: any) => {
 
         currUser = user
 
-        socket.join(userObj.roomid)
+        socket.join(user.room)
         const message: string = "has joined the Room 🎉"
-        socket.to(userObj.roomid).emit('message', generateMessage(userObj.username, message))
+        socket.to(user.room).emit('message', generateMessage(user.username, message))
 
-        updateUsersList(userObj.roomid)
-
-        socket.to(userObj.roomid).emit("newUserJoined")
+        updateUsersList(user.room)
 
     })
 
@@ -90,6 +88,10 @@ io.on("connection", (socket: any) => {
 
     socket.on("newVideoAdded", (newVideo: string) => {
         socket.to(currUser.room).emit("newVideoAdded", newVideo)
+    })
+
+    socket.on("newUserJoined", () => {
+        socket.to(currUser.room).emit("newUserJoined")
     })
 
 

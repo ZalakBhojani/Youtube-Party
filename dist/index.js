@@ -53,11 +53,10 @@ io.on("connection", (socket) => {
         };
         users_1.addUser(user);
         currUser = user;
-        socket.join(userObj.roomid);
+        socket.join(user.room);
         const message = "has joined the Room 🎉";
-        socket.to(userObj.roomid).emit('message', messages_1.generateMessage(userObj.username, message));
-        updateUsersList(userObj.roomid);
-        socket.to(userObj.roomid).emit("newUserJoined");
+        socket.to(user.room).emit('message', messages_1.generateMessage(user.username, message));
+        updateUsersList(user.room);
     });
     socket.on("videoPaused", () => {
         socket.to(currUser.room).emit("videoPaused");
@@ -72,6 +71,9 @@ io.on("connection", (socket) => {
     });
     socket.on("newVideoAdded", (newVideo) => {
         socket.to(currUser.room).emit("newVideoAdded", newVideo);
+    });
+    socket.on("newUserJoined", () => {
+        socket.to(currUser.room).emit("newUserJoined");
     });
 });
 httpServer.listen(port, () => {

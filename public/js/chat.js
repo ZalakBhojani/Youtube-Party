@@ -10,12 +10,14 @@ const params = new URLSearchParams(window.location.search);
 var username = params.get('username');
 var roomid;
 var role;
+var control;
 
 if (params.has('roomid')) {
     role = 'GUEST';
     roomid = params.get('roomid');
     socket.emit("joinRoom", { username, roomid, role });
     document.getElementById("roomid").value = roomid;
+    control = 0;
 } else {
     role = 'ADMIN';
     socket.emit("createRoom", { username, role });
@@ -23,6 +25,7 @@ if (params.has('roomid')) {
         roomid = id;
         document.getElementById("roomid").value = id;
     })
+    control = 1;
 }
 
 // Elements
@@ -108,6 +111,7 @@ socket.on('roomUsersList', (usersList) => {
 
 
 
+
 //YOUTUBE
 // 2. This code loads the IFrame Player API code asynchronously.
 var tag = document.createElement('script');
@@ -125,7 +129,8 @@ function onYouTubeIframeAPIReady() {
         width: '800',
         videoId: currVideo,
         playerVars: {
-            'playsinline': 1
+            'playsinline': 1,
+            'controls': control
         },
         events: {
             'onReady': onPlayerReady,
@@ -137,6 +142,7 @@ function onYouTubeIframeAPIReady() {
 // 4. The API will call this function when the video player is ready.
 function onPlayerReady(event) {
     event.target.pauseVideo();
+    socket.emit("newUserJoined")
 }
 
 // 5. The API calls this function when the player's state changes.
@@ -170,5 +176,4 @@ socket.on("newUserJoined", () => {
             socket.emit("videoPlaying", currentTime)
         }
     }
-
 })
