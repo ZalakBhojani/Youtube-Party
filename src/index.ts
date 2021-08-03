@@ -3,7 +3,7 @@ import path from 'path';
 import { createServer } from "http";
 import socketIO from "socket.io";
 import { generateMessage } from './utils/messages';
-import { addUser, getUser, UserType, getAllUsers } from './utils/users';
+import { addUser, getUser, UserType, getAllUsers, getRoomOwner } from './utils/users';
 import { generateRoomID } from './utils/generateRoomID';
 
 const app: express.Application = express();
@@ -90,8 +90,9 @@ io.on("connection", (socket: any) => {
         socket.to(currUser.room).emit("newVideoAdded", newVideo)
     })
 
-    socket.on("newUserJoined", () => {
-        socket.to(currUser.room).emit("newUserJoined")
+    socket.on("getLatestTime", () => {
+        const socket_id: string = getRoomOwner(currUser.room)!
+        socket.to(socket_id).emit("getLatestTime")
     })
 
 

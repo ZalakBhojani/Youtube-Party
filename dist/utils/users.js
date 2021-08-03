@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllUsers = exports.getUser = exports.removeUser = exports.addUser = void 0;
+exports.getRoomOwner = exports.getAllUsers = exports.getUser = exports.removeUser = exports.addUser = void 0;
 const users = [];
 const addUser = (userObj) => {
     // Clean the data, remove whitespaces
@@ -32,6 +32,14 @@ const getAllUsers = () => {
     return users;
 };
 exports.getAllUsers = getAllUsers;
+const getRoomOwner = (roomid) => {
+    for (var idx = 0; idx < users.length; idx++) {
+        if (users[idx].room === roomid && users[idx].role == 'ADMIN') {
+            return users[idx].id;
+        }
+    }
+};
+exports.getRoomOwner = getRoomOwner;
 // export const updateRole = (id: string, newRole: number) => {
 //     const index: number = users.findIndex(user => user.id == id)
 //     if (newRole ==== 1 && users[index].role == 'GUEST') {

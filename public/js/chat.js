@@ -113,16 +113,18 @@ socket.on('roomUsersList', (usersList) => {
 
 
 //YOUTUBE
-// 2. This code loads the IFrame Player API code asynchronously.
+
+// this code loads the IFrame Player API code asynchronously
 var tag = document.createElement('script');
 
 tag.src = "https://www.youtube.com/iframe_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-// 3. This function creates an <iframe> (and YouTube player)
-//    after the API code downloads.
+// this function creates an <iframe> (and YouTube player)
+// after the API code downloads.
 var player;
+
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '450',
@@ -139,25 +141,35 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
-// 4. The API will call this function when the video player is ready.
+// the API will call this function when the video player is ready
 function onPlayerReady(event) {
     event.target.pauseVideo();
-    socket.emit("newUserJoined")
+    socket.emit("getLatestTime")
 }
 
-// 5. The API calls this function when the player's state changes.
-//    The function indicates that when playing a video (state=1),
-//    the player should play for six seconds and then stop.
+var pausedByUser = false;
 function onPlayerStateChange(event) {
 
-    if (event.data === YT.PlayerState.PAUSED && role === 'ADMIN') {
-        socket.emit("videoPaused");
+    if (event.data === YT.PlayerState.PAUSED) {
+        if (role === 'ADMIN') {
+            socket.emit("videoPaused");
+        }
+        else {
+            pausedByUser = true;
+        }
     }
 
-    if (event.data === YT.PlayerState.PLAYING && role === 'ADMIN') {
-        const currentTime = player.getCurrentTime()
-        socket.emit("videoPlaying", currentTime)
+    if (event.data === YT.PlayerState.PLAYING) {
+        if (role === 'ADMIN') {
+            const currentTime = player.getCurrentTime()
+            socket.emit("videoPlaying", currentTime)
+        }
+        else {
+            pausedByUser = false;
+            socket.emit("getLatestTime")
+        }
     }
+
 }
 
 socket.on("videoPaused", () => {
@@ -165,15 +177,15 @@ socket.on("videoPaused", () => {
 })
 
 socket.on("videoPlaying", (currentTime) => {
-    player.seekTo(currentTime, true)
-    player.playVideo();
+    if (pausedByUser === false) {
+        player.seekTo(currentTime, true)
+        player.playVideo();
+    }
 })
 
-socket.on("newUserJoined", () => {
-    if (role === 'ADMIN') {
-        const currentTime = player.getCurrentTime()
-        if (currentTime > 0) {
-            socket.emit("videoPlaying", currentTime)
-        }
+socket.on("getLatestTime", () => {
+    const currentTime = player.getCurrentTime()
+    if (currentTime > 0) {
+        socket.emit("videoPlaying", currentTime)
     }
 })

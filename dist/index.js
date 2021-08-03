@@ -72,8 +72,9 @@ io.on("connection", (socket) => {
     socket.on("newVideoAdded", (newVideo) => {
         socket.to(currUser.room).emit("newVideoAdded", newVideo);
     });
-    socket.on("newUserJoined", () => {
-        socket.to(currUser.room).emit("newUserJoined");
+    socket.on("getLatestTime", () => {
+        const socket_id = users_1.getRoomOwner(currUser.room);
+        socket.to(socket_id).emit("getLatestTime");
     });
 });
 httpServer.listen(port, () => {

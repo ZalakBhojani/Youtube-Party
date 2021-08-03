@@ -10,6 +10,8 @@ export type UserType = {
 
 const users: UserType[] = [];
 
+// add a user to the users list
+// throw an error if the username is already taken
 export const addUser = (userObj: UserType) => {
     // Clean the data, remove whitespaces
     userObj.username = userObj.username.trim();
@@ -18,7 +20,7 @@ export const addUser = (userObj: UserType) => {
     // Check if user already exists
     const userFound: UserType | undefined = users.find(
         user => user.room === userObj.room && user.username === userObj.username)
-    
+
     if (userFound) {
         return {
             error: "Username already taken. Please enter a different username"
@@ -26,10 +28,11 @@ export const addUser = (userObj: UserType) => {
     }
 
     users.push(userObj);
-    return {userObj}
+    return { userObj }
 
 }
 
+// remove a user from the room
 export const removeUser = (id: string) => {
 
     const index: number = users.findIndex(user => user.id == id)
@@ -39,19 +42,22 @@ export const removeUser = (id: string) => {
     }
 }
 
+// given an id, return the user with that id
 export const getUser = (id: string) => {
     return users.find((user) => user.id == id);
 }
 
+// get list of all users
 export const getAllUsers = () => {
     return users;
 }
 
-// export const updateRole = (id: string, newRole: number) => {
+// given the roomid, get the id of the owner of the room
+export const getRoomOwner = (roomid: string) => {
 
-//     const index: number = users.findIndex(user => user.id == id)
-
-//     if (newRole ==== 1 && users[index].role == 'GUEST') {
-//         users[index].role = 'ADMIN'
-//     }
-// }
+    for (var idx = 0; idx < users.length; idx++) {
+        if (users[idx].room === roomid && users[idx].role == 'ADMIN') {
+            return users[idx].id
+        }
+    }
+}
