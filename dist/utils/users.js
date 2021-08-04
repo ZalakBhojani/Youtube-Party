@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRoomOwner = exports.getAllUsers = exports.getUser = exports.removeUser = exports.addUser = void 0;
 const users = [];
+// add a user to the users list
+// throw an error if the username is already taken
 const addUser = (userObj) => {
     // Clean the data, remove whitespaces
     userObj.username = userObj.username.trim();
@@ -17,6 +19,7 @@ const addUser = (userObj) => {
     return { userObj };
 };
 exports.addUser = addUser;
+// remove a user from the room
 const removeUser = (id) => {
     const index = users.findIndex(user => user.id == id);
     if (index != -1) {
@@ -24,14 +27,17 @@ const removeUser = (id) => {
     }
 };
 exports.removeUser = removeUser;
+// given an id, return the user with that id
 const getUser = (id) => {
     return users.find((user) => user.id == id);
 };
 exports.getUser = getUser;
+// get list of all users
 const getAllUsers = () => {
     return users;
 };
 exports.getAllUsers = getAllUsers;
+// given the roomid, get the id of the owner of the room
 const getRoomOwner = (roomid) => {
     for (var idx = 0; idx < users.length; idx++) {
         if (users[idx].room === roomid && users[idx].role == 'ADMIN') {
@@ -40,9 +46,3 @@ const getRoomOwner = (roomid) => {
     }
 };
 exports.getRoomOwner = getRoomOwner;
-// export const updateRole = (id: string, newRole: number) => {
-//     const index: number = users.findIndex(user => user.id == id)
-//     if (newRole ==== 1 && users[index].role == 'GUEST') {
-//         users[index].role = 'ADMIN'
-//     }
-// }

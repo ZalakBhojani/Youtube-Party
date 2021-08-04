@@ -35,17 +35,17 @@ const $messageFormInput = document.querySelector("#inputMessage");
 const $urlForm = document.querySelector("#url-form");
 const $messages = document.querySelector('#messages');
 const $users = document.querySelector('#users');
+const $videoTitle = document.querySelector("#video-title");
+const $channelName = document.querySelector("#channel-name");
+const $videos = document.querySelector('#videos');
+
 
 // Templates
 const messageTemplate = document.querySelector("#message-template").innerHTML;
 const userTemplate = document.querySelector("#user-template").innerHTML;
+const videoTemplate = document.querySelector("#video-template").innerHTML;
 
-// gets the videoID from URL (string) 
-function youtube_parser(url) {
-    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
-    var match = url.match(regExp);
-    return (match && match[7].length == 11) ? match[7] : false;
-}
+
 
 // Socket communication
 $messageForm.addEventListener('submit', (e) => {
@@ -65,24 +65,67 @@ $messageForm.addEventListener('submit', (e) => {
     })
 })
 
+// gets the videoID from URL (string) 
+function youtube_parser(url) {
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+    var match = url.match(regExp);
+    return (match && match[7].length == 11) ? match[7] : false;
+}
+
 var currVideo = 'M7lc1UVf-VE';
 var queue = [];
 var url;
 
-$urlForm.addEventListener('submit', (event) => {
-    event.preventDefault()
-
+function addVideo() {
     url = $urlForm.elements['url'].value
+
+    const Http = new XMLHttpRequest();
+    const requestUrl = 'https://www.youtube.com/oembed?url=' + url + '&format=json';
+    Http.open("GET", requestUrl);
+    Http.send();
+
+    Http.onreadystatechange = (e) => {
+        if (Http.readyState == 4 && Http.status == 200) {
+            const res = JSON.parse(Http.responseText)
+
+            const video = {
+                title: res.title,
+                channel: res.author_name,
+                thumbnail_url: res.thumbnail_url
+            }
+            $videoTitle.innerHTML = video.title
+            $channelName.innerHTML = video.channel
+
+            const html = Mustache.render(videoTemplate, {
+                thumbnail_url: video.thumbnail_url,
+                title: video.title
+            })
+            $videos.insertAdjacentHTML('beforeend', html)
+
+            queue.push(video);
+            console.log(video);
+        }
+    }
+
+
+
     currVideo = youtube_parser(url)
     $urlForm.elements['url'].value = ''
 
     player.loadVideoById(currVideo)
     socket.emit("newVideoAdded", currVideo)
+}
 
+
+$urlForm.addEventListener('submit', (event) => {
+    event.preventDefault()
+    addVideo()
 })
 
 socket.on("newVideoAdded", (newVideo) => {
-    player.loadVideoById(newVideo)
+    if (role === 'GUEST') {
+        player.loadVideoById(newVideo)
+    }
 })
 
 
@@ -107,6 +150,7 @@ socket.on('roomUsersList', (usersList) => {
         $users.insertAdjacentHTML('beforeend', html)
     }
 })
+
 
 
 
@@ -165,8 +209,10 @@ function onPlayerStateChange(event) {
             socket.emit("videoPlaying", currentTime)
         }
         else {
+            if (pausedByUser == false) {
+                socket.emit("getLatestTime")
+            }
             pausedByUser = false;
-            socket.emit("getLatestTime")
         }
     }
 
