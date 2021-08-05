@@ -57,6 +57,8 @@ io.on("connection", (socket) => {
         const message = "has joined the Room 🎉";
         socket.to(user.room).emit('message', messages_1.generateMessage(user.username, message));
         updateUsersList(user.room);
+        const socket_id = users_1.getRoomOwner(currUser.room);
+        socket.to(socket_id).emit("getUpdatedPlaylist");
     });
     socket.on("videoPaused", () => {
         socket.to(currUser.room).emit("videoPaused");
@@ -69,8 +71,11 @@ io.on("connection", (socket) => {
         io.to(user.room).emit('message', messages_1.generateMessage(user.username, message));
         callback();
     });
-    socket.on("newVideoAdded", (newVideo) => {
-        socket.to(currUser.room).emit("newVideoAdded", newVideo);
+    socket.on("playlistUpdated", (updatedPlaylist) => {
+        socket.to(currUser.room).emit("playlistUpdated", updatedPlaylist);
+    });
+    socket.on("playNextVideo", () => {
+        socket.to(currUser.room).emit("playNextVideo");
     });
     socket.on("getLatestTime", () => {
         const socket_id = users_1.getRoomOwner(currUser.room);

@@ -29,6 +29,7 @@
                     </div>
                     <div class="col">
                         <b style="font-size: 36px;">YouTube Party</b>
+                        <p id="greeting"></p>
                     </div>
                 </div>
 
@@ -46,15 +47,23 @@
                 <div class="video-container">
                     <div id="player"></div>
                 </div>
-                <h3 id="video-title" class="mt-5">YouTube Developers Live</h3>
-                <p id="channel-name">YouTube Channel</p>
+                <div class="row mt-5">
+                    <div class="col-lg-10">
+                        <h4 id="video-title">YouTube Developers Live</h4>
+                        <p id="channel-name">YouTube Channel</p>
+                    </div>
+                    <div class="col-lg-2">
+                        <button class="btn btn-danger" type="submit" id="next-video">Next Video</button>
+                    </div>
+                </div>
+
             </div>
             <div class="col-lg-4">
                 <div class="row mb-4">
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" id="roomid" readonly>
                         <div class="input-group-append">
-                            <button class="btn btn-primary" id="btn" data-clipboard-target="#roomid" type="button">Copy
+                            <button class="btn btn-danger" id="btn" data-clipboard-target="#roomid" type="button">Copy
                                 Room ID</button>
                         </div>
                     </div>

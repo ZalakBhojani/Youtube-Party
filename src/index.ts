@@ -70,6 +70,9 @@ io.on("connection", (socket: any) => {
 
         updateUsersList(user.room)
 
+        const socket_id: string = getRoomOwner(currUser.room)!
+        socket.to(socket_id).emit("getUpdatedPlaylist")
+
     })
 
     socket.on("videoPaused", () => {
@@ -86,8 +89,12 @@ io.on("connection", (socket: any) => {
         callback()
     })
 
-    socket.on("newVideoAdded", (newVideo: string) => {
-        socket.to(currUser.room).emit("newVideoAdded", newVideo)
+    socket.on("playlistUpdated", (updatedPlaylist: string) => {
+        socket.to(currUser.room).emit("playlistUpdated", updatedPlaylist)
+    })
+
+    socket.on("playNextVideo", () => {
+        socket.to(currUser.room).emit("playNextVideo")
     })
 
     socket.on("getLatestTime", () => {

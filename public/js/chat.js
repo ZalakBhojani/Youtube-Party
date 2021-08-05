@@ -5,29 +5,6 @@ var btn = document.getElementById('btn');
 var clipboard = new ClipboardJS(btn);
 
 
-// Fetch user details
-const params = new URLSearchParams(window.location.search);
-var username = params.get('username');
-var roomid;
-var role;
-var control;
-
-if (params.has('roomid')) {
-    role = 'GUEST';
-    roomid = params.get('roomid');
-    socket.emit("joinRoom", { username, roomid, role });
-    document.getElementById("roomid").value = roomid;
-    control = 0;
-} else {
-    role = 'ADMIN';
-    socket.emit("createRoom", { username, role });
-    socket.on("getRoomID", (id) => {
-        roomid = id;
-        document.getElementById("roomid").value = id;
-    })
-    control = 1;
-}
-
 // Elements
 const $messageForm = document.querySelector('#message-form');
 const $messageFormButton = document.querySelector("#submit-button");
@@ -38,6 +15,8 @@ const $users = document.querySelector('#users');
 const $videoTitle = document.querySelector("#video-title");
 const $channelName = document.querySelector("#channel-name");
 const $videos = document.querySelector('#videos');
+const $nextVideo = document.querySelector("#next-video")
+const $greet = document.querySelector("#greeting")
 
 
 // Templates
@@ -45,6 +24,33 @@ const messageTemplate = document.querySelector("#message-template").innerHTML;
 const userTemplate = document.querySelector("#user-template").innerHTML;
 const videoTemplate = document.querySelector("#video-template").innerHTML;
 
+
+// Fetch user details
+const params = new URLSearchParams(window.location.search);
+var username = params.get('username');
+var roomid;
+var role;
+var control;
+$greet.innerHTML = "Welcome, " + username
+
+if (params.has('roomid')) {
+    role = 'GUEST';
+    roomid = params.get('roomid');
+    socket.emit("joinRoom", { username, roomid, role });
+    document.getElementById("roomid").value = roomid;
+    $urlForm.style.visibility = "hidden"
+    $nextVideo.style.visibility = "hidden"
+    control = 0;
+
+} else {
+    role = 'ADMIN';
+    socket.emit("createRoom", { username, role });
+    socket.on("getRoomID", (id) => {
+        roomid = id;
+        document.getElementById("roomid").value = id;
+    })
+    control = 1;
+}
 
 
 // Socket communication
@@ -72,48 +78,68 @@ function youtube_parser(url) {
     return (match && match[7].length == 11) ? match[7] : false;
 }
 
-var currVideo = 'M7lc1UVf-VE';
-var queue = [];
-var url;
+
+var playlistQueue = [];
+
+function displayPlaylist() {
+    $videos.innerHTML = ''
+    for (var idx = 0; idx < playlistQueue.length; idx++) {
+        const video = playlistQueue[idx]
+        const html = Mustache.render(videoTemplate, {
+            thumbnail_url: video.thumbnail_url,
+            title: video.title
+        })
+        $videos.insertAdjacentHTML('beforeend', html)
+    }
+}
+
+function playNextVideo() {
+    if (playlistQueue.length > 0) {
+
+        const nextVideo = playlistQueue.shift()
+        player.cueVideoById(youtube_parser(nextVideo.video_url), 0)
+        $videoTitle.innerHTML = nextVideo.title
+        $channelName.innerHTML = nextVideo.channel
+
+        displayPlaylist()
+    }
+}
 
 function addVideo() {
-    url = $urlForm.elements['url'].value
 
-    const Http = new XMLHttpRequest();
-    const requestUrl = 'https://www.youtube.com/oembed?url=' + url + '&format=json';
-    Http.open("GET", requestUrl);
-    Http.send();
+    if (role === 'ADMIN') {
+        const url = $urlForm.elements['url'].value
 
-    Http.onreadystatechange = (e) => {
-        if (Http.readyState == 4 && Http.status == 200) {
-            const res = JSON.parse(Http.responseText)
+        const Http = new XMLHttpRequest();
+        const requestUrl = 'https://www.youtube.com/oembed?url=' + url + '&format=json';
+        Http.open("GET", requestUrl);
+        Http.send();
 
-            const video = {
-                title: res.title,
-                channel: res.author_name,
-                thumbnail_url: res.thumbnail_url
+        Http.onreadystatechange = (e) => {
+            if (Http.readyState == 4 && Http.status == 200) {
+                const res = JSON.parse(Http.responseText)
+
+                const video = {
+                    title: res.title,
+                    channel: res.author_name,
+                    thumbnail_url: res.thumbnail_url,
+                    video_url: url
+                }
+
+                playlistQueue.push(video);
+                socket.emit("playlistUpdated", playlistQueue)
+                displayPlaylist()
             }
-            $videoTitle.innerHTML = video.title
-            $channelName.innerHTML = video.channel
-
-            const html = Mustache.render(videoTemplate, {
-                thumbnail_url: video.thumbnail_url,
-                title: video.title
-            })
-            $videos.insertAdjacentHTML('beforeend', html)
-
-            queue.push(video);
-            console.log(video);
         }
+
+        $urlForm.elements['url'].value = ''
     }
 
+}
 
-
-    currVideo = youtube_parser(url)
-    $urlForm.elements['url'].value = ''
-
-    player.loadVideoById(currVideo)
-    socket.emit("newVideoAdded", currVideo)
+$nextVideo.onclick = function () {
+    playNextVideo()
+    socket.emit("playNextVideo")
 }
 
 
@@ -122,10 +148,16 @@ $urlForm.addEventListener('submit', (event) => {
     addVideo()
 })
 
-socket.on("newVideoAdded", (newVideo) => {
-    if (role === 'GUEST') {
-        player.loadVideoById(newVideo)
-    }
+socket.on("playlistUpdated", (updatedPlaylist) => {
+    console.log("Got updated");
+    playlistQueue = updatedPlaylist
+    displayPlaylist()
+})
+
+// Only ADMIN will receive this
+socket.on("getUpdatedPlaylist", () => {
+    console.log("Got update message");
+    socket.emit("playlistUpdated", playlistQueue)
 })
 
 
@@ -173,10 +205,12 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '450',
         width: '800',
-        videoId: currVideo,
+        videoId: 'M7lc1UVf-VE',
         playerVars: {
             'playsinline': 1,
-            'controls': control
+            'controls': control,
+            'start': 0,
+            'disablekb': 1
         },
         events: {
             'onReady': onPlayerReady,
@@ -191,16 +225,18 @@ function onPlayerReady(event) {
     socket.emit("getLatestTime")
 }
 
-var pausedByUser = false;
+var track = []; // user = 1, admin = 2
 function onPlayerStateChange(event) {
 
     if (event.data === YT.PlayerState.PAUSED) {
         if (role === 'ADMIN') {
             socket.emit("videoPaused");
         }
-        else {
-            pausedByUser = true;
-        }
+        // else {
+        //     if (track.length == 0) {
+        //         track.push(1)
+        //     }
+        // }
     }
 
     if (event.data === YT.PlayerState.PLAYING) {
@@ -208,25 +244,34 @@ function onPlayerStateChange(event) {
             const currentTime = player.getCurrentTime()
             socket.emit("videoPlaying", currentTime)
         }
-        else {
-            if (pausedByUser == false) {
-                socket.emit("getLatestTime")
-            }
-            pausedByUser = false;
-        }
+        // else {
+        //     if (pausedByAdmin === 1 && pausedByUser === 0) {
+        //         socket.emit("getLatestTime")
+        //         pausedByAdmin = -1;
+        //     }
+
+        //     // pausedByAdmin = false;
+        // }
+    }
+
+    if (event.data === YT.PlayerState.ENDED) {
+        playNextVideo()
     }
 
 }
 
 socket.on("videoPaused", () => {
+    // console.log("paused by admin");
+    track.push(2)
     player.pauseVideo();
 })
 
 socket.on("videoPlaying", (currentTime) => {
-    if (pausedByUser === false) {
-        player.seekTo(currentTime, true)
-        player.playVideo();
-    }
+    // console.log("played by admin");
+    // if (pausedByAdmin === true && pausedByUser === false) {
+    player.seekTo(currentTime, true)
+    player.playVideo();
+    // }
 })
 
 socket.on("getLatestTime", () => {
@@ -234,4 +279,8 @@ socket.on("getLatestTime", () => {
     if (currentTime > 0) {
         socket.emit("videoPlaying", currentTime)
     }
+})
+
+socket.on("playNextVideo", () => {
+    playNextVideo()
 })
