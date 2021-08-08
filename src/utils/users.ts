@@ -18,17 +18,15 @@ export const addUser = (userObj: UserType) => {
     userObj.room = userObj.room.trim();
 
     // Check if user already exists
-    const userFound: UserType | undefined = users.find(
-        user => user.room === userObj.room && user.username === userObj.username)
+    const userFound: UserType | undefined = checkIfUserExists(userObj)
 
     if (userFound) {
         return {
-            error: "Username already taken. Please enter a different username"
+            error: "Username already taken. Please enter a different username."
         }
     }
 
     users.push(userObj);
-    return { userObj }
 
 }
 
@@ -50,6 +48,11 @@ export const getUser = (id: string) => {
 // get list of all users
 export const getAllUsers = () => {
     return users;
+}
+
+export const checkIfUserExists = (userObj: UserType) => {
+    return users.find(user => user.room === userObj.room
+        && user.username === userObj.username)
 }
 
 // given the roomid, get the id of the owner of the room

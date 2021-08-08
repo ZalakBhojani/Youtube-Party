@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const path_1 = __importDefault(require("path"));
 const http_1 = require("http");
 const socket_io_1 = __importDefault(require("socket.io"));
 const messages_1 = require("./utils/messages");
@@ -14,20 +13,26 @@ const app = express_1.default();
 const port = process.env.PORT || 3000;
 const httpServer = http_1.createServer(app);
 const io = new socket_io_1.default.Server(httpServer);
-const publicDirectoryPath = path_1.default.join(__dirname, '../public');
-app.use(express_1.default.static(publicDirectoryPath));
+// const publicDirectoryPath: string = path.join(__dirname, '../public')
+app.use(express_1.default.static('public'));
 // Parse URL-encoded bodies (as sent by HTML forms)
-app.use(express_1.default.urlencoded());
+app.use(express_1.default.urlencoded({ extended: true }));
 // Parse JSON bodies (as sent by API clients)
 app.use(express_1.default.json());
-app.post("/room.html", (req, res) => {
-    console.log(req.body);
-    res.end();
-});
+// app.get("/", (req, res) => {
+//     console.log("came");
+// })
+// app.get("/room/:username", (req, res) => {
+//     console.log("came");
+//     console.log(req.params.username);
+// })
+// req.flash('success_msg', 'You are registered and can now login')
+// res.redirect('/users/login')
 io.on("connection", (socket) => {
     var currUser;
     const updateUsersList = (roomID) => {
         const usersList = users_1.getAllUsers();
+        socket.emit('roomUsersList', { usersList });
         socket.to(roomID).emit('roomUsersList', { usersList });
     };
     socket.on("createRoom", (userObj) => {
@@ -44,14 +49,21 @@ io.on("connection", (socket) => {
         socket.emit("getRoomID", (roomID));
         updateUsersList(roomID);
     });
-    socket.on("joinRoom", (userObj) => {
+    socket.on("joinRoom", (userObj, callback) => {
         const user = {
             id: socket.id,
             username: userObj.username,
             room: userObj.roomid,
             role: userObj.role
         };
-        users_1.addUser(user);
+        const error = users_1.addUser(user);
+        console.log(error);
+        if (error) {
+            return callback(error);
+        }
+        else {
+            callback();
+        }
         currUser = user;
         socket.join(user.room);
         const message = "has joined the Room 🎉";

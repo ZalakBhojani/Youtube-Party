@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRoomOwner = exports.getAllUsers = exports.getUser = exports.removeUser = exports.addUser = void 0;
+exports.getRoomOwner = exports.checkIfUserExists = exports.getAllUsers = exports.getUser = exports.removeUser = exports.addUser = void 0;
 const users = [];
 // add a user to the users list
 // throw an error if the username is already taken
@@ -9,14 +9,13 @@ const addUser = (userObj) => {
     userObj.username = userObj.username.trim();
     userObj.room = userObj.room.trim();
     // Check if user already exists
-    const userFound = users.find(user => user.room === userObj.room && user.username === userObj.username);
+    const userFound = exports.checkIfUserExists(userObj);
     if (userFound) {
         return {
-            error: "Username already taken. Please enter a different username"
+            error: "Username already taken. Please enter a different username."
         };
     }
     users.push(userObj);
-    return { userObj };
 };
 exports.addUser = addUser;
 // remove a user from the room
@@ -37,6 +36,11 @@ const getAllUsers = () => {
     return users;
 };
 exports.getAllUsers = getAllUsers;
+const checkIfUserExists = (userObj) => {
+    return users.find(user => user.room === userObj.room
+        && user.username === userObj.username);
+};
+exports.checkIfUserExists = checkIfUserExists;
 // given the roomid, get the id of the owner of the room
 const getRoomOwner = (roomid) => {
     for (var idx = 0; idx < users.length; idx++) {

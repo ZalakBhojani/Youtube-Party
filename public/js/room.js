@@ -31,26 +31,45 @@ var username = params.get('username');
 var roomid;
 var role;
 var control;
+var finished = false;
 $greet.innerHTML = "Welcome, " + username
+initialSetup();
 
-if (params.has('roomid')) {
-    role = 'GUEST';
-    roomid = params.get('roomid');
-    socket.emit("joinRoom", { username, roomid, role });
-    document.getElementById("roomid").value = roomid;
-    $urlForm.style.visibility = "hidden"
-    $nextVideo.style.visibility = "hidden"
-    control = 0;
 
-} else {
-    role = 'ADMIN';
-    socket.emit("createRoom", { username, role });
-    socket.on("getRoomID", (id) => {
-        roomid = id;
-        document.getElementById("roomid").value = id;
-    })
-    control = 1;
+async function initialSetup() {
+    if (params.has('roomid')) {
+        role = 'GUEST';
+        roomid = params.get('roomid');
+
+        await socket.emit("joinRoom", { username, roomid, role }, (error) => {
+            if (error) {
+                // location.href = '/index.html'
+                swal({
+                    title: "Oops",
+                    text: error.error,
+                    icon: "error"
+                }).then(() => {
+                    console.log(error.error);
+                    location.href = '/index.html'
+                })
+            }
+        });
+        document.getElementById("roomid").value = roomid;
+        $urlForm.style.visibility = "hidden"
+        $nextVideo.style.visibility = "hidden"
+        control = 0;
+
+    } else {
+        role = 'ADMIN';
+        socket.emit("createRoom", { username, role });
+        socket.on("getRoomID", (id) => {
+            roomid = id;
+            document.getElementById("roomid").value = id;
+        })
+        control = 1;
+    }
 }
+
 
 
 // Socket communication
@@ -107,33 +126,31 @@ function playNextVideo() {
 
 function addVideo() {
 
-    if (role === 'ADMIN') {
-        const url = $urlForm.elements['url'].value
+    const url = $urlForm.elements['url'].value
 
-        const Http = new XMLHttpRequest();
-        const requestUrl = 'https://www.youtube.com/oembed?url=' + url + '&format=json';
-        Http.open("GET", requestUrl);
-        Http.send();
+    const Http = new XMLHttpRequest();
+    const requestUrl = 'https://www.youtube.com/oembed?url=' + url + '&format=json';
+    Http.open("GET", requestUrl);
+    Http.send();
 
-        Http.onreadystatechange = (e) => {
-            if (Http.readyState == 4 && Http.status == 200) {
-                const res = JSON.parse(Http.responseText)
+    Http.onreadystatechange = (e) => {
+        if (Http.readyState == 4 && Http.status == 200) {
+            const res = JSON.parse(Http.responseText)
 
-                const video = {
-                    title: res.title,
-                    channel: res.author_name,
-                    thumbnail_url: res.thumbnail_url,
-                    video_url: url
-                }
-
-                playlistQueue.push(video);
-                socket.emit("playlistUpdated", playlistQueue)
-                displayPlaylist()
+            const video = {
+                title: res.title,
+                channel: res.author_name,
+                thumbnail_url: res.thumbnail_url,
+                video_url: url
             }
-        }
 
-        $urlForm.elements['url'].value = ''
+            playlistQueue.push(video);
+            socket.emit("playlistUpdated", playlistQueue)
+            displayPlaylist()
+        }
     }
+
+    $urlForm.elements['url'].value = ''
 
 }
 
@@ -171,6 +188,7 @@ socket.on('message', (message) => {
 
 socket.on('roomUsersList', (usersList) => {
     const list = usersList.usersList;
+    $users.innerHTML = ''
     for (var index = 0; index < list.length; index++) {
         var username = list[index].username
         if (list[index].role === 'ADMIN') {
