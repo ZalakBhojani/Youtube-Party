@@ -3,7 +3,10 @@ import path from 'path';
 import { createServer } from "http";
 import socketIO from "socket.io";
 import { generateMessage } from './utils/messages';
-import { addUser, getUser, UserType, getAllUsers, getRoomOwner } from './utils/users';
+import {
+    addUser, getUser, UserType, getAllUsers,
+    getRoomOwner, checkIfUserExists, checkIfRoomExists
+} from './utils/users';
 import { generateRoomID } from './utils/generateRoomID';
 import { callbackify } from 'util';
 
@@ -15,22 +18,31 @@ const io = new socketIO.Server(httpServer)
 
 app.use(express.static('public'));
 // Parse URL-encoded bodies (as sent by HTML forms)
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: false }))
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
 
-// app.get("/", (req, res) => {
-//     console.log("came");
-// })
 
-// app.get("/room/:username", (req, res) => {
-//     console.log("came");
-//     console.log(req.params.username);
-// })
+app.get("/room", (req, res) => {
 
-// req.flash('success_msg', 'You are registered and can now login')
-// res.redirect('/users/login')
+    const username: any = req.query.username
+    const roomid: any = req.query.roomid
 
+    if (checkIfUserExists(username, roomid) == undefined) {
+        if (checkIfRoomExists(roomid) == undefined) {
+            const message: string = "Please enter a valid Room ID."
+            res.end(JSON.stringify({ error: true, message: message }));
+        }
+        else {
+            res.end(JSON.stringify({ error: false }));
+        }
+
+    }
+    else {
+        const message: string = "Username already taken. Please enter a different username."
+        res.end(JSON.stringify({ error: true, message: message }));
+    }
+})
 
 io.on("connection", (socket: any) => {
 
@@ -61,7 +73,7 @@ io.on("connection", (socket: any) => {
 
     })
 
-    socket.on("joinRoom", (userObj: any, callback: any) => {
+    socket.on("joinRoom", (userObj: any) => {
 
         const user: UserType = {
             id: socket.id,
@@ -70,15 +82,7 @@ io.on("connection", (socket: any) => {
             role: userObj.role
         }
 
-        const error: { error: string; } | undefined = addUser(user)
-        console.log(error);
-
-
-        if (error) {
-            return callback(error)
-        } else {
-            callback()
-        }
+        addUser(user)
 
         currUser = user
 

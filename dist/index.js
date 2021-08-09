@@ -16,16 +16,29 @@ const io = new socket_io_1.default.Server(httpServer);
 // const publicDirectoryPath: string = path.join(__dirname, '../public')
 app.use(express_1.default.static('public'));
 // Parse URL-encoded bodies (as sent by HTML forms)
-app.use(express_1.default.urlencoded({ extended: true }));
+app.use(express_1.default.urlencoded({ extended: false }));
 // Parse JSON bodies (as sent by API clients)
 app.use(express_1.default.json());
 // app.get("/", (req, res) => {
 //     console.log("came");
 // })
-// app.get("/room/:username", (req, res) => {
-//     console.log("came");
-//     console.log(req.params.username);
-// })
+app.post("/room", (req, res) => {
+    const data = req.body;
+    console.log(data);
+    const username = data.username;
+    const roomid = data.roomid;
+    console.log(username, roomid);
+    // console.log(checkIfUserExists(username, roomid));
+    if (users_1.checkIfUserExists(username, roomid) == undefined) {
+        console.log("user does not exist");
+        const url = `/room.html?username=${username}&name=${roomid}`;
+        res.redirect(url);
+    }
+    else {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: "This is error" }));
+    }
+});
 // req.flash('success_msg', 'You are registered and can now login')
 // res.redirect('/users/login')
 io.on("connection", (socket) => {

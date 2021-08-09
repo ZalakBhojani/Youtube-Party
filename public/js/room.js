@@ -41,19 +41,7 @@ async function initialSetup() {
         role = 'GUEST';
         roomid = params.get('roomid');
 
-        await socket.emit("joinRoom", { username, roomid, role }, (error) => {
-            if (error) {
-                // location.href = '/index.html'
-                swal({
-                    title: "Oops",
-                    text: error.error,
-                    icon: "error"
-                }).then(() => {
-                    console.log(error.error);
-                    location.href = '/index.html'
-                })
-            }
-        });
+        socket.emit("joinRoom", { username, roomid, role });
         document.getElementById("roomid").value = roomid;
         $urlForm.style.visibility = "hidden"
         $nextVideo.style.visibility = "hidden"
